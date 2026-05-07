@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poems Shelf</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cormorant Garamond',serif}
+body{background:#f5f1e8;color:#2c1810}
+nav{background:#2c1810;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.logo{font-size:28px;font-family:'Playfair Display',serif;color:#f5f1e8;cursor:pointer}.logo span{color:#c9a227;font-style:italic}
+.nav-center{display:flex;gap:30px;align-items:center}
+.nav-links{display:flex;gap:25px;list-style:none}.nav-links a{color:#f5f1e8;text-decoration:none;font-size:15px;transition:.3s}.nav-links a:hover{color:#c9a227}
+.search{position:relative;width:280px}.search input{width:100%;padding:12px 40px 12px 20px;border:2px solid rgba(201,162,39,.3);border-radius:25px;background:rgba(245,241,232,.1);color:#f5f1e8;font-size:14px}.search input:focus{outline:none;border-color:#c9a227}
+.search::after{content:'🔍';position:absolute;right:15px;top:50%;transform:translateY(-50%);color:#c9a227;font-size:14px}
+.dropdown{position:absolute;top:50px;left:0;width:100%;background:#f5f1e8;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.3);max-height:300px;overflow-y:auto;display:none;z-index:200}
+.dropdown.show{display:block}.dropdown-item{padding:12px 15px;border-bottom:1px solid #ddd;cursor:pointer;display:flex;gap:10px;align-items:center}.dropdown-item:hover{background:#fff}
+.dropdown-item img{width:40px;height:55px;object-fit:cover;border-radius:3px}.info{flex:1}.info b{font-family:'Playfair Display',serif;font-size:14px}.info small{color:#8b6914;font-size:12px}
+.price{color:#c9a227;font-weight:bold}
+.cart-btn{background:transparent;border:2px solid #c9a227;color:#c9a227;padding:10px 20px;border-radius:20px;cursor:pointer;font-weight:600}
+.page{display:none;padding:40px 20px;max-width:1200px;margin:0 auto}.page.active{display:block}
+.hero{min-height:80vh;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(rgba(26,15,10,.9),rgba(44,24,16,.8)),url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920');background-size:cover;color:#f5f1e8}
+.hero h1{font-size:4rem;font-family:'Playfair Display',serif;margin-bottom:20px}.hero h1 span{color:#c9a227;font-style:italic}
+.hero p{font-size:1.2rem;font-style:italic;margin-bottom:30px;opacity:.9}
+.btn{background:#c9a227;border:none;padding:15px 40px;border-radius:30px;cursor:pointer;font-size:1rem;font-weight:600;color:#2c1810;transition:.3s;margin:10px}.btn:hover{background:#f5f1e8}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px;margin-top:30px}
+.card{background:#fff;border-radius:15px;overflow:hidden;box-shadow:0 5px 20px rgba(0,0,0,.1);transition:.3s}.card:hover{transform:translateY(-5px)}
+.card img{width:100%;height:300px;object-fit:cover}.card-content{padding:20px;text-align:center}
+.tag{background:#2c1810;color:#c9a227;padding:5px 12px;font-size:10px;border-radius:15px;text-transform:uppercase;letter-spacing:1px}
+.card h3{font-family:'Playfair Display',serif;margin:10px 0}.card p{color:#8b6914;font-style:italic;font-size:14px}
+.prices{color:#c9a227;font-size:1.4rem;font-weight:bold;margin:15px 0;font-family:'Playfair Display',serif}
+.add-btn{background:#8b6914;color:#fff;border:none;padding:12px;width:100%;cursor:pointer;border-radius:8px;font-weight:600}
+.cart-side{position:fixed;right:-100%;top:0;width:350px;height:100%;background:#f5f1e8;transition:.4s;padding:30px;z-index:1000;box-shadow:-5px 0 30px rgba(0,0,0,.2)}
+.cart-side.open{right:0}.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:999}.overlay.show{display:block}
+.close{position:absolute;top:15px;right:15px;background:none;border:none;font-size:28px;cursor:pointer;color:#2c1810}
+.cart-item{display:flex;gap:15px;margin-bottom:20px;padding:15px;background:#fff;border-radius:10px;align-items:center}
+.cart-item img{width:60px;height:80px;object-fit:cover;border-radius:5px}
+.total{font-size:1.3rem;margin-top:30px;padding-top:20px;border-top:3px solid #c9a227;font-family:'Playfair Display',serif}
+.checkout{background:#c9a227;border:none;padding:15px;width:100%;cursor:pointer;border-radius:10px;margin-top:15px;font-weight:bold;font-size:1.1rem}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);align-items:center;justify-content:center;padding:20px;z-index:2000}.modal.show{display:flex}
+.modal-content{background:#f5f1e8;max-width:400px;width:100%;padding:30px;border-radius:15px;max-height:90vh;overflow-y:auto}
+input,textarea,select{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px;font-family:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.qr{display:none;margin:20px 0;padding:20px;background:#fff;border-radius:10px;text-align:center;border:2px dashed #c9a227}.qr.show{display:block}
+canvas{border:3px solid #2c1810;border-radius:10px}
+.submit{background:#c9a227;border:none;padding:15px;width:100%;cursor:pointer;border-radius:10px;font-weight:bold;margin-top:15px}
+</style>
+<base target="_blank">
+</head>
+<body>
+<nav><div class="logo" onclick="show('home')">📚 <span>Poems</span>Shelf</div><div class="nav-center"><ul class="nav-links"><li><a href="#" onclick="show('home')">Home</a></li><li><a href="#" onclick="show('products')">Collection</a></li><li><a href="#" onclick="show('about')">About</a></li></ul><div class="search"><input type="text" id="search" placeholder="Search books..." oninput="doSearch(this.value)" onfocus="if(this.value)doSearch(this.value)"><div class="dropdown" id="drop"></div></div></div><button class="cart-btn" onclick="toggleCart()">🛒 <span id="count">0</span></button></nav>
+
+<div class="page active" id="home"><div class="hero"><div><h1>Where <span>Words</span> Come Alive</h1><p>"A room without books is like a body without a soul"</p><button class="btn" onclick="show('products')">Explore</button></div></div><div style="padding:40px 20px;max-width:1200px;margin:0 auto"><h2 style="text-align:center;font-family:'Playfair Display',serif;font-size:2.5rem;margin-bottom:30px">Featured</h2><div class="grid" id="feat"></div></div></div>
+
+<div class="page" id="products"><h2 style="text-align:center;font-family:'Playfair Display',serif;font-size:2.5rem;margin-bottom:30px">All Books</h2><div class="grid" id="all"></div></div>
+
+<div class="page" id="about" style="text-align:center;max-width:600px"><h2 style="font-family:'Playfair Display',serif;font-size:3rem;margin-bottom:20px">Our Story</h2><p style="font-size:1.2rem;line-height:1.8;color:#555;margin-bottom:30px">Welcome to Poems Shelf, a sanctuary for poetry lovers featuring Filipino and international voices.</p><div style="background:#fff;padding:30px;border-radius:15px"><p style="font-style:italic;color:#8b6914;font-size:1.3rem">"Poetry is the spontaneous overflow of powerful feelings"</p></div></div>
+
+<div class="overlay" onclick="toggleCart()"></div><div class="cart-side" id="cart"><button class="close" onclick="toggleCart()">×</button><h2 style="font-family:'Playfair Display',serif;margin-bottom:20px">Your Cart</h2><div id="items"></div><div class="total">Total: ₱<span id="total">0</span></div><button class="checkout" onclick="openCheckout()">Checkout</button></div>
+
+<div class="modal" id="checkout"><div class="modal-content"><h3 style="font-family:'Playfair Display',serif;text-align:center;margin-bottom:20px">Complete Order</h3><div id="sum" style="background:#fff;padding:15px;border-radius:10px;margin-bottom:20px"></div><form onsubmit="submitOrder(event)"><div class="row"><input placeholder="First Name" required><input placeholder="Last Name" required></div><input placeholder="Email" type="email" required><input placeholder="Phone" required><textarea placeholder="Address" required></textarea><div class="row"><input placeholder="City" required><input placeholder="Postal" required></div><select id="pay" onchange="toggleQR()" required><option value="">Payment</option><option>Cash on Delivery</option><option>GCash</option><option>Card</option></select><div class="qr" id="qr"><p>Scan to pay with GCash</p><canvas id="qrCanvas" width="180" height="180"></canvas><p style="font-size:12px;color:#666">Ref: PS-<span id="ref"></span></p></div><button type="submit" class="submit">Place Order</button></form></div></div>
+
+<script>
+const books=[{id:1,title:"55 Poems",author:"Jose Garcia Villa",price:450,cat:"Classic",img:"https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1300093963i/10787442.jpg"},{id:2,title:"Maaari",author:"Allan Popa",price:395,cat:"Filipino",img:"https://down-ph.img.susercontent.com/file/300df9680254c0407643c7b30291937f"},{id:3,title:"Dark Hours",author:"Conchitina Cruz",price:350,cat:"Modern",img:"https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1313037268i/1621262.jpg"},{id:4,title:"Antiemetic for Homesickness",author:"Romalyn Ante",price:650,cat:"Filipino",img:"https://m.media-amazon.com/images/I/813er3Ta5hL._AC_UF894,1000_QL80_.jpg"},{id:5,title:"Jolography Retconned",author:"Paolo Manalo",price:495,cat:"Filipino",img:"https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1583240312i/52045694.jpg"},{id:6,title:"Mga Tala at Tula",author:"Ron Canimo",price:450,cat:"Filipino",img:"https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1754166843i/56573826.jpg"},{id:7,title:"Sa Buwan Kita Natagpuan",author:"Ron Canimo",price:550,cat:"Love",img:"https://down-ph.img.susercontent.com/file/sg-11134202-7rfgj-m41ozflhjyjm76"},{id:8,title:"Ikaw sa Bawat Araw",author:"Ron Canimo",price:550,cat:"Love",img:"https://down-ph.img.susercontent.com/file/ph-11134207-81ztp-mhnknk4pt3ib2f"},{id:9,title:"I Hope We Meet Again",author:"Ron Canimo",price:550,cat:"Love",img:"https://p16-oec-sg.ibyteimg.com/tos-alisg-i-aphluv4xwc-sg/d385a911cc724fcc8f822d32598fd543~tplv-aphluv4xwc-resize-webp:800:800.webp"},{id:10,title:"The Tracks of Babylon",author:"Edith Tiempo",price:550,cat:"Classic",img:"https://pictures.abebooks.com/isbn/9789718967706-uk.jpg"}];
+let cart=[];
+const card=b=>`<div class="card"><img src="${b.img}"><div class="card-content"><span class="tag">${b.cat}</span><h3>${b.title}</h3><p>${b.author}</p><div class="prices">₱${b.price}</div><button class="add-btn" onclick="add(${b.id})">Add to Cart</button></div></div>`;
+const render=()=>{document.getElementById('feat').innerHTML=books.slice(0,4).map(card).join('');document.getElementById('all').innerHTML=books.map(card).join('')};
+const doSearch=q=>{const d=document.getElementById('drop');if(!q){d.classList.remove('show');return}const f=books.filter(b=>b.title.toLowerCase().includes(q.toLowerCase())||b.author.toLowerCase().includes(q.toLowerCase()));d.innerHTML=f.map(b=>`<div class="dropdown-item" onclick="selectBook(${b.id})"><img src="${b.img}"><div class="info"><b>${b.title}</b><br><small>${b.author}</small></div><div class="price">₱${b.price}</div></div>`).join('');d.classList.toggle('show',f.length>0)};
+const selectBook=id=>{document.getElementById('search').value=books.find(b=>b.id===id).title;document.getElementById('drop').classList.remove('show');show('products');setTimeout(()=>{const c=document.querySelectorAll('.card')[books.findIndex(b=>b.id===id)];if(c)c.scrollIntoView({behavior:'smooth',block:'center'})},100)};
+const add=id=>{const b=books.find(x=>x.id===id),ex=cart.find(x=>x.id===id);ex?ex.q++:cart.push({...b,q:1});update()};
+const remove=id=>{cart=cart.filter(x=>x.id!==id);update()};
+const update=()=>{document.getElementById('count').innerText=cart.reduce((a,b)=>a+b.q,0);const t=cart.reduce((a,b)=>a+b.price*b.q,0);document.getElementById('total').innerText=t;document.getElementById('items').innerHTML=cart.length?cart.map(c=>`<div class="cart-item"><img src="${c.img}"><div style="flex:1"><b>${c.title}</b><p style="font-size:12px;color:#8b6914">${c.author}</p><p>₱${c.price} x ${c.q}</p></div><button style="background:#c44;color:#fff;border:none;padding:5px 10px;cursor:pointer;border-radius:5px" onclick="remove(${c.id})">×</button></div>`).join(''):'<p style="text-align:center;color:#666;padding:40px">Empty</p>'};
+const toggleCart=()=>{document.getElementById('cart').classList.toggle('open');document.querySelector('.overlay').classList.toggle('show')};
+const show=p=>{document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(p).classList.add('active');window.scrollTo(0,0)};
+const openCheckout=()=>{if(!cart.length)return;const t=cart.reduce((a,b)=>a+b.price*b.q,0);document.getElementById('sum').innerHTML=cart.map(c=>`<p>${c.title} x${c.q} = ₱${c.price*c.q}</p>`).join('')+`<p><b>Total: ₱${t}</b></p>`;document.getElementById('ref').innerText=Math.random().toString(36).substr(2,9).toUpperCase();document.getElementById('checkout').classList.add('show');toggleCart()};
+const submitOrder=e=>{e.preventDefault();alert('Order placed!');cart=[];update();document.getElementById('checkout').classList.remove('show');show('home')};
+const toggleQR=()=>{const m=document.getElementById('pay').value,qr=document.getElementById('qr');qr.classList.toggle('show',m==='GCash');if(m==='GCash'){const c=document.getElementById('qrCanvas'),ctx=c.getContext('2d'),s=12;ctx.fillStyle='#fff';ctx.fillRect(0,0,180,180);ctx.fillStyle='#2c1810';for(let i=0;i<15;i++)for(let j=0;j<15;j++)if(Math.random()>0.5)ctx.fillRect(i*s,j*s,s,s);ctx.fillStyle='#c9a227';ctx.fillRect(0,0,3*s,3*s);ctx.fillRect(12*s,0,3*s,3*s);ctx.fillRect(0,12*s,3*s,3*s)}};
+document.getElementById('checkout').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('show')});
+render();update();
+</script>
+</body>
+</html>
